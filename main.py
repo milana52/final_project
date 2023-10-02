@@ -174,7 +174,7 @@ class Update(Child):
 
     def init_edit(self):
         """Инициализация окна редактирования"""
-        self.title("Редактирование контакта")
+        self.title("Редактирование сотрудника")
         btn_edit = ttk.Button(self, text="Редактировать")
         btn_edit.place(x=205, y=170)
         btn_edit.bind(
@@ -205,7 +205,7 @@ class Search(tk.Toplevel):
 
     def init_search(self):
         """Инициализация окна поиска"""
-        self.title("Поиск контакта")
+        self.title("Поиск сотрудника")
         self.geometry("300x100")
         self.resizable(False, False)
 
