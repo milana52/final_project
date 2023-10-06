@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import sqlite3
 
+
 class Main(tk.Frame):
     def __init__(self, root):
         super().__init__(root)
@@ -10,10 +11,8 @@ class Main(tk.Frame):
         self.view_records()
 
     def init_main(self):
-        """Инициализация основного интерфейса программы"""
         toolbar = tk.Frame(bg="#d7d8e0", bd=2)
         toolbar.pack(side=tk.TOP, fill=tk.X)
-
         self.add_img = tk.PhotoImage(file="./img/add.png")
         btn_open_dialog = tk.Button(
             toolbar, bg="#d7d8e0", bd=0, image=self.add_img, command=self.open_dialog
@@ -24,13 +23,11 @@ class Main(tk.Frame):
             self, columns=("ID", "name", "tel", "email"), height=45, show="headings"
         )
 
-        # Конфигурация колонок таблицы
         self.tree.column("ID", width=30, anchor=tk.CENTER)
         self.tree.column("name", width=300, anchor=tk.CENTER)
         self.tree.column("tel", width=150, anchor=tk.CENTER)
         self.tree.column("email", width=150, anchor=tk.CENTER)
 
-        # Заголовки колонок таблицы
         self.tree.heading("ID", text="ID")
         self.tree.heading("name", text="ФИО")
         self.tree.heading("tel", text="Телефон")
@@ -38,7 +35,6 @@ class Main(tk.Frame):
 
         self.tree.pack(side=tk.LEFT)
 
-        # Кнопка редактирования записи
         self.update_img = tk.PhotoImage(file="./img/update.png")
         btn_edit_dialog = tk.Button(
             toolbar,
@@ -49,7 +45,6 @@ class Main(tk.Frame):
         )
         btn_edit_dialog.pack(side=tk.LEFT)
 
-        # Кнопка удаления записи
         self.delete_img = tk.PhotoImage(file="./img/delete.png")
         btn_delete = tk.Button(
             toolbar,
@@ -60,7 +55,6 @@ class Main(tk.Frame):
         )
         btn_delete.pack(side=tk.LEFT)
 
-        # Кнопка поиска записей
         self.search_img = tk.PhotoImage(file="./img/search.png")
         btn_search = tk.Button(
             toolbar,
@@ -72,26 +66,21 @@ class Main(tk.Frame):
         btn_search.pack(side=tk.LEFT)
 
     def open_dialog(self):
-        """Открытие диалогового окна для добавления записи"""
         Child()
 
     def records(self, name, tel, email):
-        """Добавление новой записи в базу данных и обновление отображения"""
         self.db.insert_data(name, tel, email)
         self.view_records()
 
     def view_records(self):
-        """Отображение всех записей базы данных в виде таблицы"""
         self.db.cursor.execute("SELECT * FROM db")
         [self.tree.delete(i) for i in self.tree.get_children()]
         [self.tree.insert("", "end", values=row) for row in self.db.cursor.fetchall()]
 
     def open_update_dialog(self):
-        """Открытие диалогового окна для редактирования записи"""
         Update()
 
     def update_records(self, name, tel, email):
-        """Обновление выбранной записи в базе данных и обновление отображения"""
         self.db.cursor.execute(
             """UPDATE db SET name=?, tel=?, email=? WHERE id=?""",
             (name, tel, email, self.tree.set(self.tree.selection()[0], "#1")),
@@ -100,26 +89,23 @@ class Main(tk.Frame):
         self.view_records()
 
     def delete_records(self):
-        """Удаление выбранных записей из базы данных и обновление отображения"""
         for selection_items in self.tree.selection():
             self.db.cursor.execute(
-
                 "DELETE FROM db WHERE id=?", (self.tree.set(selection_items, "#1"))
             )
         self.db.conn.commit()
         self.view_records()
 
     def open_search_dialog(self):
-        """Открытие диалогового окна для поиска записей"""
         Search()
 
     def search_records(self, name):
-        """Поиск записей в базе данных по заданному имени и обновление отображения"""
         name = "%" + name + "%"
-        self.db.cursor.execute("SELECT * FROM db WHERE name LIKE ?", (name,)) 
+        self.db.cursor.execute("SELECT * FROM db WHERE name LIKE ?", (name,)) #сюда передаем кортеж (name), а не просто name
 
         [self.tree.delete(i) for i in self.tree.get_children()]
         [self.tree.insert("", "end", values=row) for row in self.db.cursor.fetchall()]
+
 
 class Child(tk.Toplevel):
     def __init__(self):
@@ -128,7 +114,6 @@ class Child(tk.Toplevel):
         self.view = app
 
     def init_child(self):
-        """Инициализация дочернего окна"""
         self.title("Добавить")
         self.geometry("400x220")
         self.resizable(False, False)
@@ -173,8 +158,7 @@ class Update(Child):
         self.default_data()
 
     def init_edit(self):
-        """Инициализация окна редактирования"""
-        self.title("Редактирование сотрудника")
+        self.title("Редактирование контакта")
         btn_edit = ttk.Button(self, text="Редактировать")
         btn_edit.place(x=205, y=170)
         btn_edit.bind(
@@ -204,8 +188,7 @@ class Search(tk.Toplevel):
         self.view = app
 
     def init_search(self):
-        """Инициализация окна поиска"""
-        self.title("Поиск сотрудника")
+        self.title("Поиск контакта")
         self.geometry("300x100")
         self.resizable(False, False)
 
@@ -215,7 +198,7 @@ class Search(tk.Toplevel):
         self.entry_search = ttk.Entry(self)
         self.entry_search.place(x=100, y=20, width=150)
 
-        btn_cancel = ttk.Button(self, text="Закрыть", command=self.destroy) 
+        btn_cancel = ttk.Button(self, text="Закрыть", command=self.destroy) #тут не должно быть скобок у self.destroy
         btn_cancel.place(x=185, y=50)
 
         search_btn = ttk.Button(self, text="Найти")
@@ -239,7 +222,6 @@ class DB:
                 email TEXT
             )"""
         )
-
         self.conn.commit()
 
     def insert_data(self, name, tel, email):
@@ -254,10 +236,7 @@ if __name__ == "__main__":
     db = DB()
     app = Main(root)
     app.pack()
-    root.title("Список сотрудников компании")
+    root.title("Телефонная книга")
     root.geometry("665x450")
     root.resizable(False, False)
     root.mainloop()
-
-
-
